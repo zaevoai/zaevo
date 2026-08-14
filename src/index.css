@@ -1,0 +1,465 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --color-sky-top: #5280ff;
+  --color-ink: #000000;
+  --color-hairline: rgba(0, 0, 0, 0.075);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    margin: 0;
+    /* the page now ends in the black footer, so overscroll should match it */
+    background-color: #000000;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* the custom cursor replaces the native one; utilities like cursor-pointer
+     would otherwise re-show the system arrow on buttons and inputs */
+  @media (pointer: fine) {
+    body,
+    body * {
+      cursor: none !important;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .sky {
+    background-image: linear-gradient(180deg, #5280ff 0%, #ffffff 100%);
+  }
+
+  .glass {
+    position: relative;
+    isolation: isolate;
+    background-color: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.14),
+      0 10px 30px rgba(16, 32, 84, 0.14);
+  }
+
+  /* specular sheen that gives the glass its wet, liquid highlight */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.06) 42%,
+      rgba(255, 255, 255, 0) 62%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
+  }
+
+  /* confirmation seal: the disc lands, the check strokes itself in, then the
+     page beacons outward — the visual echo of an address leaving the building.
+     seal-in/rise/drop end on the element's natural styles, so `backwards` is
+     enough; `both` would freeze `transform: none` on and beat the hover lifts */
+  .seal-in {
+    animation: seal-in 520ms cubic-bezier(0.34, 1.4, 0.5, 1) 120ms backwards;
+  }
+
+  .seal-draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    /* starts while the disc is still settling, so the two read as one motion
+       rather than an empty white circle waiting for its contents */
+    animation: seal-draw 440ms cubic-bezier(0.65, 0, 0.35, 1) 340ms both;
+  }
+
+  .seal-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+    animation: seal-ring 3600ms ease-out infinite;
+    animation-delay: var(--ring-delay, 0ms);
+  }
+
+  /* every element below the seal enters on the same curve, offset by --rise-delay */
+  .rise {
+    animation: rise 640ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  .drop {
+    animation: drop 620ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  /* the landing's opening, cued off the same --rise-delay as .rise above.
+     word-in slides each headline word up from behind its own line — the mask
+     is the wrapper's overflow, so the word is never merely faded in. */
+  .word-in {
+    animation: word-in 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  /* the wordmark resolves out of the splash's afterimage: the blur burns off
+     as it settles, so the two screens read as one continuous shot */
+  .lockup-in {
+    animation: lockup-in 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  /* scroll-triggered entrance (src/components/Reveal.jsx), on the same curve as
+     .rise above. A transition rather than a keyframe on purpose: it ends on the
+     element's own computed styles, so the hover lifts on links and buttons
+     inside stay live afterwards instead of being pinned by an animation fill. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* two beats of white on the waitlist field, for CTAs that jump the page to it */
+  .field-flash {
+    animation: field-flash 1400ms ease-out;
+  }
+
+  /* splash-screen loading bar under the logo; duration must match FILL_MS in
+     Preloader.jsx so the fade-out waits for the fill to actually finish */
+  .preloader-bar {
+    width: 0%;
+    animation: preloader-fill 3300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+}
+
+@keyframes preloader-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes field-flash {
+  0%,
+  100% {
+    background-color: rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+  14% {
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.5);
+  }
+  44% {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+  62% {
+    background-color: rgba(255, 255, 255, 0.32);
+    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* the blur is the site's shared lead-element resolve (see lockup-in); the
+   overshoot in the timing function is this page's own, and worth keeping — a
+   confirmation should land rather than merely arrive. Kept at seal-in's
+   original duration so seal-draw and seal-ring stay in step with it. */
+@keyframes seal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes seal-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes seal-ring {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 130% rather than 100%: the wrapper's descender padding sits below the
+   content box, and a shorter throw lets the tops of tall letters peek into it */
+@keyframes word-in {
+  from {
+    transform: translateY(130%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes lockup-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* shiny animated-border CTA (src/components/ui/shiny-button.jsx). Left
+   unlayered so it always wins over Tailwind's own @layer utilities, and the
+   --waitlist size modifier overrides the pill default to match the fixed
+   field-button footprint it sits inside. */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-percent {
+  syntax: "<percentage>";
+  initial-value: 5%;
+  inherits: false;
+}
+
+@property --gradient-shine {
+  syntax: "<color>";
+  initial-value: white;
+  inherits: false;
+}
+
+.shiny-cta {
+  --shiny-cta-bg: #000000;
+  --shiny-cta-bg-subtle: #1a1818;
+  --shiny-cta-fg: #ffffff;
+  --shiny-cta-highlight: var(--color-sky-top);
+  --shiny-cta-highlight-subtle: #b7c9ff;
+  --animation: gradient-angle linear infinite;
+  --duration: 3s;
+  --shadow-size: 2px;
+  --transition: 800ms cubic-bezier(0.25, 1, 0.5, 1);
+
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  outline-offset: 4px;
+  padding: 1.25rem 2.5rem;
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 360px;
+  color: var(--shiny-cta-fg);
+  background:
+    linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg)) padding-box,
+    conic-gradient(
+        from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+        transparent,
+        var(--shiny-cta-highlight) var(--gradient-percent),
+        var(--gradient-shine) calc(var(--gradient-percent) * 2),
+        var(--shiny-cta-highlight) calc(var(--gradient-percent) * 3),
+        transparent calc(var(--gradient-percent) * 4)
+      )
+      border-box;
+  box-shadow: inset 0 0 0 1px var(--shiny-cta-bg-subtle);
+  transition: var(--transition);
+  transition-property: --gradient-angle-offset, --gradient-percent, --gradient-shine;
+}
+
+.shiny-cta:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* fixed-footprint variant that keeps the join-waitlist button's original
+   size and corner radius instead of the pill default above */
+.shiny-cta--waitlist {
+  width: 150px;
+  height: 49px;
+  padding: 0;
+  border-radius: 14px;
+  font-size: 15px;
+}
+
+.shiny-cta::before,
+.shiny-cta::after,
+.shiny-cta span::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  z-index: -1;
+}
+
+.shiny-cta:active {
+  translate: 0 1px;
+}
+
+/* dots pattern */
+.shiny-cta::before {
+  --size: calc(100% - var(--shadow-size) * 3);
+  --position: 2px;
+  --space: calc(var(--position) * 2);
+  width: var(--size);
+  height: var(--size);
+  background: radial-gradient(circle at var(--position) var(--position), white calc(var(--position) / 4), transparent 0)
+    padding-box;
+  background-size: var(--space) var(--space);
+  background-repeat: space;
+  mask-image: conic-gradient(from calc(var(--gradient-angle) + 45deg), black, transparent 10% 90%, black);
+  border-radius: inherit;
+  opacity: 0.4;
+  z-index: -1;
+}
+
+/* inner shimmer */
+.shiny-cta::after {
+  --animation: shimmer linear infinite;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(-50deg, transparent, var(--shiny-cta-highlight), transparent);
+  mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  opacity: 0.6;
+}
+
+.shiny-cta span {
+  z-index: 1;
+}
+
+.shiny-cta span::before {
+  --size: calc(100% + 1rem);
+  width: var(--size);
+  height: var(--size);
+  box-shadow: inset 0 -1ex 2rem 4px var(--shiny-cta-highlight);
+  opacity: 0;
+  transition: opacity var(--transition);
+  animation: calc(var(--duration) * 1.5) breathe linear infinite;
+}
+
+.shiny-cta,
+.shiny-cta::before,
+.shiny-cta::after {
+  animation:
+    var(--animation) var(--duration),
+    var(--animation) calc(var(--duration) / 0.4) reverse paused;
+  animation-composition: add;
+}
+
+.shiny-cta:is(:hover, :focus-visible) {
+  --gradient-percent: 20%;
+  --gradient-angle-offset: 95deg;
+  --gradient-shine: var(--shiny-cta-highlight-subtle);
+}
+
+.shiny-cta:is(:hover, :focus-visible),
+.shiny-cta:is(:hover, :focus-visible)::before,
+.shiny-cta:is(:hover, :focus-visible)::after {
+  animation-play-state: running;
+}
+
+.shiny-cta:is(:hover, :focus-visible) span::before {
+  opacity: 1;
+}
+
+@keyframes gradient-angle {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes breathe {
+  from,
+  to {
+    scale: 1;
+  }
+  50% {
+    scale: 1.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* the beacon loops forever; clamping its duration would thrash rather than calm */
+  .seal-ring {
+    display: none;
+  }
+}
