@@ -61,16 +61,16 @@ const Landing = ({ onJoined, focusWaitlistOnMount = false }) => {
         <header className="absolute inset-x-0 top-[18px] px-4">
           <nav
             style={cue(240)}
-            className={`glass mx-auto flex h-[64px] w-full max-w-[960px] items-center justify-between rounded-[20px] border border-white/30 pl-[44px] pr-[15px] ${enter('drop')}`}
+            className={`glass mx-auto flex h-[64px] w-full max-w-[960px] items-center justify-between rounded-[20px] border border-white/30 pl-[18px] pr-[12px] sm:pl-[44px] sm:pr-[15px] ${enter('drop')}`}
           >
-            <HomeLink className="flex items-center gap-[10px] text-white">
+            <HomeLink className="flex shrink-0 items-center gap-[8px] text-white sm:gap-[10px]">
               <ZaevoMark width={31} height={27} className="block shrink-0" />
-              <span className="text-[26px] leading-none font-semibold tracking-[-0.052em]">Zaevo</span>
+              <span className="text-[20px] leading-none font-semibold tracking-[-0.052em] sm:text-[26px]">Zaevo</span>
             </HomeLink>
             <a
               href="#waitlist"
               onClick={callOutWaitlist}
-              className="flex h-[39px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pl-[22px] pr-[19px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+              className="cta-lift flex h-[44px] shrink-0 cursor-pointer items-center gap-[6px] rounded-[14px] bg-white pl-[16px] pr-[14px] text-[14px] font-semibold text-black hover:bg-white/90 sm:gap-[7px] sm:pl-[22px] sm:pr-[19px] sm:text-[15px]"
             >
               Join now
               <ArrowRight />
@@ -92,7 +92,7 @@ const Landing = ({ onJoined, focusWaitlistOnMount = false }) => {
             text="Meet Zae, your AI copartner."
             play={intro}
             delay={380}
-            className="mt-[57px] translate-x-[4px] text-center text-[56px] leading-[1.1] font-semibold tracking-[-0.05em] text-black"
+            className="mt-[57px] translate-x-[4px] text-center text-[38px] leading-[1.1] font-semibold tracking-[-0.05em] text-black sm:text-[56px]"
           />
 
           <p
@@ -116,7 +116,7 @@ const Landing = ({ onJoined, focusWaitlistOnMount = false }) => {
               ))}
             </div>
             <p className="translate-y-[1px] font-mono text-[14.7px] leading-none text-black">
-              3,100+ builders already waiting
+              Be the first to try Zae
             </p>
           </div>
 

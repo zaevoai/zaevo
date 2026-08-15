@@ -54,7 +54,7 @@ const ThankYou = ({ email, onHome }) => {
               href={DISCORD.href}
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-[39px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+              className="cta-lift flex h-[44px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black hover:bg-white/90"
             >
               Join Discord
               <ArrowRight />

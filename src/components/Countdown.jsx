@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const LAUNCH = new Date(2026, 9, 23, 0, 0, 0)
+const LAUNCH = new Date('2026-10-11T16:00:00-04:00')
 
 const getRemaining = () => {
   const ms = Math.max(0, LAUNCH.getTime() - Date.now())
@@ -16,8 +16,8 @@ const getRemaining = () => {
 const pad = (value) => String(value).padStart(2, '0')
 
 const Unit = ({ value, label }) => (
-  <div className="flex w-[72px] flex-col items-center">
-    <span className="flex h-[46px] items-center text-[44px] leading-none font-semibold tabular-nums tracking-[-0.05em] text-black">
+  <div className="flex w-[58px] flex-col items-center sm:w-[72px]">
+    <span className="flex h-[36px] items-center text-[34px] leading-none font-semibold tabular-nums tracking-[-0.05em] text-black sm:h-[46px] sm:text-[44px]">
       {pad(value)}
     </span>
     <span className="mt-[12px] text-[10px] font-semibold uppercase tracking-[0.14em] text-black/40">
@@ -29,7 +29,7 @@ const Unit = ({ value, label }) => (
 const Colon = () => (
   <span
     aria-hidden="true"
-    className="flex h-[46px] items-center text-[34px] leading-none font-semibold text-black/25"
+    className="flex h-[36px] items-center text-[26px] leading-none font-semibold text-black/25 sm:h-[46px] sm:text-[34px]"
   >
     :
   </span>
@@ -48,7 +48,7 @@ const Countdown = () => {
   return (
     <div className="mt-[40px] flex flex-col items-center">
       <p className="text-[13px] font-medium tracking-[-0.01em] text-black/55">
-        {isLive ? 'Early access is open' : 'Early access opens October 23, 2026'}
+        {isLive ? 'Early access is open' : 'Early access opens October 11, 2026'}
       </p>
 
       <div aria-hidden="true" className="mt-[18px] flex items-start">
@@ -62,7 +62,7 @@ const Countdown = () => {
       </div>
 
       <p className="sr-only">
-        Early access opens on <time dateTime="2026-10-23">October 23, 2026</time>.
+        Early access opens on <time dateTime="2026-10-11T16:00:00-04:00">October 11, 2026, 4:00 PM ET</time>.
       </p>
     </div>
   )

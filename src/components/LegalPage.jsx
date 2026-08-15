@@ -108,7 +108,7 @@ const LegalPage = ({ document: doc, onHome, onHomeToWaitlist }) => {
             <a
               href="/"
               onClick={onHome}
-              className="flex h-[39px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+              className="cta-lift flex h-[44px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black hover:bg-white/90"
             >
               Back to home
               <ArrowRight />
@@ -202,7 +202,7 @@ const LegalPage = ({ document: doc, onHome, onHomeToWaitlist }) => {
           <Reveal className="mt-[56px]">
             <a
               href={doc.counterpart.path}
-              className="flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] border border-black/15 pr-[22px] pl-[26px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-black/[0.04]"
+              className="cta-lift flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] border border-black/15 pr-[22px] pl-[26px] text-[15px] font-semibold text-black hover:bg-black/[0.04]"
             >
               Read the {doc.counterpart.title}
               <ArrowRight />

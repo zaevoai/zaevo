@@ -47,7 +47,7 @@ const SocialLinks = ({ className = 'mt-[34px]', revealDelay }) => (
             ? undefined
             : { '--rise-delay': `${revealDelay + index * 80}ms` }
         }
-        className={`flex h-[38px] w-[38px] items-center justify-center rounded-full text-black/45 transition-[color,background-color,transform] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:bg-black/[0.05] hover:text-black ${
+        className={`flex h-[44px] w-[44px] items-center justify-center rounded-full text-black/45 transition-[color,background-color,transform] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:bg-black/[0.05] hover:text-black ${
           revealDelay === undefined ? '' : 'rise'
         }`}
       >

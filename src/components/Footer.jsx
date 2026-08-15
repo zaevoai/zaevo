@@ -34,7 +34,7 @@ const Footer = ({ action = DEFAULT_ACTION, onHome }) => (
           onClick={action.onClick}
           target={action.href.startsWith('http') ? '_blank' : undefined}
           rel={action.href.startsWith('http') ? 'noreferrer noopener' : undefined}
-          className="flex h-[39px] w-fit shrink-0 cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+          className="cta-lift flex h-[44px] w-fit shrink-0 cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black hover:bg-white/90"
         >
           {action.label}
           <ArrowRight />
@@ -69,7 +69,7 @@ const Footer = ({ action = DEFAULT_ACTION, onHome }) => (
               rel="noreferrer noopener"
               aria-label={name}
               title={name}
-              className="flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-full text-white/45 transition-colors duration-200 hover:bg-white/[0.08] hover:text-white"
+              className="flex h-[44px] w-[44px] cursor-pointer items-center justify-center rounded-full text-white/45 transition-[color,background-color,transform] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:bg-white/[0.08] hover:text-white"
             >
               <Icon />
             </a>

@@ -42,18 +42,18 @@ const useScrambledCode = () => {
 }
 
 const Unit = ({ digit, label }) => (
-  <div className="flex w-[68px] flex-col items-center sm:w-[92px]">
-    <span className="flex h-[46px] items-center text-[46px] leading-none font-semibold tabular-nums tracking-[-0.05em] text-black sm:h-[64px] sm:text-[64px]">
+  <div className="flex w-[84px] flex-col items-center sm:w-[150px] lg:w-[210px]">
+    <span className="flex h-[76px] items-center text-[76px] leading-none font-semibold tabular-nums tracking-[-0.05em] text-black drop-shadow-[0_18px_36px_rgba(16,32,84,0.28)] sm:h-[132px] sm:text-[132px] lg:h-[188px] lg:text-[188px]">
       {digit}
     </span>
-    <span className="mt-[12px] text-[10px] font-semibold uppercase tracking-[0.14em] text-black/40">
+    <span className="mt-[10px] text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40 sm:mt-[16px] sm:text-[13px] lg:text-[15px]">
       {label}
     </span>
   </div>
 )
 
 const Colon = () => (
-  <span className="flex h-[46px] items-center text-[34px] leading-none font-semibold text-black/25 sm:h-[64px] sm:text-[44px]">
+  <span className="flex h-[76px] items-center text-[44px] leading-none font-semibold text-black/25 sm:h-[132px] sm:text-[80px] lg:h-[188px] lg:text-[112px]">
     :
   </span>
 )
@@ -84,7 +84,7 @@ const NotFound = ({ onHome, onHomeToWaitlist }) => {
             <a
               href="/"
               onClick={onHome}
-              className="flex h-[39px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+              className="cta-lift flex h-[44px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black hover:bg-white/90"
             >
               Back to home
               <ArrowRight />
@@ -94,15 +94,24 @@ const NotFound = ({ onHome, onHomeToWaitlist }) => {
 
         <main
           id="top"
-          className="flex flex-col items-center px-4 pt-[150px] pb-[110px] text-center"
+          className="relative flex flex-col items-center px-4 pt-[130px] pb-[100px] text-center"
         >
+          {/* a soft halo behind the numerals — the same blue the sky gradient
+              is built from, just concentrated and blurred, so the giant 404
+              reads as this page's one hero moment instead of plain black
+              type sitting on the gradient */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 opacity-70 blur-[90px] sm:h-[420px] sm:w-[420px] lg:h-[560px] lg:w-[560px]"
+          />
+
           {/* the page's lead element, so it takes the same blur-resolve as the
               home hero's wordmark — the digits are still scrambling as it
               sharpens, which is the effect doing the page's own job */}
           <div
             aria-hidden="true"
             style={{ '--rise-delay': '120ms' }}
-            className="lockup-in flex items-start"
+            className="lockup-in relative flex items-start"
           >
             <Unit digit={digits[0]} label={LABELS[0]} />
             <Colon />
@@ -133,7 +142,7 @@ const NotFound = ({ onHome, onHomeToWaitlist }) => {
             <a
               href="/"
               onClick={onHome}
-              className="flex h-[49px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[22px] pl-[26px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+              className="cta-lift flex h-[49px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[22px] pl-[26px] text-[15px] font-semibold text-black hover:bg-white/90"
             >
               Back to home
               <ArrowRight />
@@ -141,7 +150,7 @@ const NotFound = ({ onHome, onHomeToWaitlist }) => {
             <a
               href="/#waitlist"
               onClick={onHomeToWaitlist}
-              className="flex h-[49px] cursor-pointer items-center rounded-[14px] border border-white px-[26px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/35"
+              className="cta-lift flex h-[49px] cursor-pointer items-center rounded-[14px] border border-white px-[26px] text-[15px] font-semibold text-black hover:bg-white/35"
             >
               Join the waitlist
             </a>

@@ -142,7 +142,7 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
         onAnimationEnd={(event) => {
           if (event.target === event.currentTarget) setIsHighlighted(false)
         }}
-        className={`flex h-[61px] items-center rounded-[20px] border border-white pl-[19px] pr-[5px] ${
+        className={`flex h-[61px] items-center rounded-[20px] border border-white pl-[14px] pr-[5px] sm:pl-[19px] ${
           isHighlighted ? 'field-flash' : ''
         }`}
       >
@@ -161,7 +161,7 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
           maxLength={MAX_EMAIL_LENGTH}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={error ? 'waitlist-error' : undefined}
-          className="h-full min-w-0 flex-1 bg-transparent text-[13.2px] font-medium text-[#0d0d10] outline-none placeholder:text-[#0d0d10]"
+          className="h-full min-w-0 flex-1 bg-transparent text-[16px] font-medium text-[#0d0d10] outline-none placeholder:text-[#0d0d10] sm:text-[13.2px]"
         />
         <ShinyButton
           type="submit"

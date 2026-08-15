@@ -82,7 +82,7 @@ const TextField = ({ id, label, error, isTextarea, fieldRef, ...inputProps }) =>
         ref={fieldRef}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`mt-[6px] w-full rounded-[10px] border border-black/[0.09] px-[16px] text-[14px] font-medium text-black outline-none transition-colors duration-200 placeholder:text-black/35 focus:border-black/30 ${
+        className={`mt-[6px] w-full rounded-[10px] border border-black/[0.09] px-[16px] text-[16px] font-medium text-black outline-none transition-colors duration-200 placeholder:text-black/35 focus:border-black/30 sm:text-[14px] ${
           isTextarea ? 'py-[13px] leading-[21px]' : 'h-[48px]'
         }`}
         {...inputProps}
@@ -287,7 +287,7 @@ const ContactForm = () => {
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] bg-[#0f0f0f] pr-[22px] pl-[26px] text-[15px] font-semibold text-white transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+          className="cta-lift cta-lift--dark flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] bg-[#0f0f0f] pr-[22px] pl-[26px] text-[15px] font-semibold text-white hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === 'submitting' ? 'Sending…' : 'Send message'}
           <ArrowRight />
@@ -336,7 +336,7 @@ const Contact = ({ onHome, onHomeToWaitlist }) => {
             <a
               href="/"
               onClick={onHome}
-              className="flex h-[39px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-white/90"
+              className="cta-lift flex h-[44px] cursor-pointer items-center gap-[7px] rounded-[14px] bg-white pr-[19px] pl-[22px] text-[15px] font-semibold text-black hover:bg-white/90"
             >
               Back to home
               <ArrowRight />
@@ -444,7 +444,7 @@ const Contact = ({ onHome, onHomeToWaitlist }) => {
             <a
               href="/#waitlist"
               onClick={onHomeToWaitlist}
-              className="mt-[18px] flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] bg-[#0f0f0f] pr-[22px] pl-[26px] text-[15px] font-semibold text-white transition-[background-color,transform] duration-200 hover:-translate-y-[2px] hover:bg-[#262626]"
+              className="cta-lift cta-lift--dark mt-[18px] flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] bg-[#0f0f0f] pr-[22px] pl-[26px] text-[15px] font-semibold text-white hover:bg-[#262626]"
             >
               Join the waitlist
               <ArrowRight />

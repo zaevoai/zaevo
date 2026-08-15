@@ -87,7 +87,7 @@ const TicketReveal = ({ email, onTorn, onClose }) => {
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="absolute top-[22px] right-[22px] flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full text-white/70 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+        className="absolute top-[16px] right-[16px] flex h-[44px] w-[44px] cursor-pointer items-center justify-center rounded-full text-white/70 transition-colors duration-200 hover:bg-white/10 hover:text-white"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M1 1L15 15M15 1L1 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
