@@ -8,6 +8,7 @@ import Reveal from './Reveal.jsx'
 import { SOCIALS } from './SocialLinks.jsx'
 import { supabase } from '../lib/supabaseClient.js'
 import { validateEmail, MAX_EMAIL_LENGTH } from '../lib/validateEmail.js'
+import { domainAcceptsMail } from '../lib/checkDomain.js'
 
 const CONTACT_EMAIL = 'zaevocontact@gmail.com'
 /* raised by the ratelimit.enforce() trigger on contact_messages */
@@ -60,6 +61,16 @@ const ExternalIcon = () => (
   </svg>
 )
 
+/* shared with WaitlistForm's error message so a rejected field reads the
+   same way everywhere on the site */
+const ErrorIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="2" />
+    <path d="M12 7.5v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="16.5" r="1.15" fill="currentColor" />
+  </svg>
+)
+
 const RadioDot = ({ isChecked }) => (
   <span
     className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-colors duration-200 ${
@@ -70,7 +81,7 @@ const RadioDot = ({ isChecked }) => (
   </span>
 )
 
-const TextField = ({ id, label, error, isTextarea, fieldRef, ...inputProps }) => {
+const TextField = ({ id, label, error, isTextarea, fieldRef, isShaking, onAnimationEnd, ...inputProps }) => {
   const Element = isTextarea ? 'textarea' : 'input'
   return (
     <div>
@@ -82,13 +93,19 @@ const TextField = ({ id, label, error, isTextarea, fieldRef, ...inputProps }) =>
         ref={fieldRef}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`mt-[6px] w-full rounded-[10px] border border-black/[0.09] px-[16px] text-[16px] font-medium text-black outline-none transition-colors duration-200 placeholder:text-black/35 focus:border-black/30 sm:text-[14px] ${
+        onAnimationEnd={onAnimationEnd}
+        className={`mt-[6px] w-full rounded-[10px] border px-[16px] text-[16px] font-medium text-black outline-none transition-colors duration-200 placeholder:text-black/35 focus:border-black/30 sm:text-[14px] ${
           isTextarea ? 'py-[13px] leading-[21px]' : 'h-[48px]'
-        }`}
+        } ${error ? 'border-[#e2483a]' : 'border-black/[0.09]'} ${error && isShaking ? 'field-shake' : ''}`}
         {...inputProps}
       />
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-[6px] text-[13px] font-medium text-black">
+        <p
+          id={`${id}-error`}
+          role="alert"
+          className="error-in mt-[6px] flex items-center gap-[6px] text-[13px] font-medium text-[#e2483a]"
+        >
+          <ErrorIcon />
           {error}
         </p>
       )}
@@ -102,6 +119,7 @@ const ContactForm = () => {
   const [topic, setTopic] = useState(TOPICS[0].subject)
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState({})
+  const [isShaking, setIsShaking] = useState(false)
   const [status, setStatus] = useState('idle')
   const [submitError, setSubmitError] = useState('')
   /* the entrance belongs to the page's first paint. Coming back from the sent
@@ -122,6 +140,7 @@ const ContactForm = () => {
     setTopic(TOPICS[0].subject)
     setMessage('')
     setErrors({})
+    setIsShaking(false)
     setStatus('idle')
     setIsFresh(false)
   }, [])
@@ -144,16 +163,33 @@ const ContactForm = () => {
       }
       setErrors(nextErrors)
 
-      if (nextErrors.name) return nameRef.current?.focus()
-      if (nextErrors.email) return emailRef.current?.focus()
-      if (nextErrors.message) return messageRef.current?.focus()
+      if (nextErrors.name || nextErrors.email || nextErrors.message) {
+        setIsShaking(true)
+        if (nextErrors.name) return nameRef.current?.focus()
+        if (nextErrors.email) return emailRef.current?.focus()
+        return messageRef.current?.focus()
+      }
 
+      const normalisedEmail = email.trim().toLowerCase()
+      const domain = normalisedEmail.slice(normalisedEmail.lastIndexOf('@') + 1)
       setSubmitError('')
+      setStatus('checking')
+
+      /* see WaitlistForm.jsx — confirms the domain can receive mail at all,
+         which a shape check alone can't tell you */
+      if (!(await domainAcceptsMail(domain))) {
+        setStatus('idle')
+        setErrors({ ...nextErrors, email: "That domain doesn't look like it can receive mail — check for a typo." })
+        setIsShaking(true)
+        emailRef.current?.focus()
+        return
+      }
+
       setStatus('submitting')
 
       const { error: insertError } = await supabase.from('contact_messages').insert({
         name: name.trim(),
-        email: email.trim().toLowerCase(),
+        email: normalisedEmail,
         topic,
         message: message.trim(),
       })
@@ -246,11 +282,16 @@ const ContactForm = () => {
           label="Name"
           fieldRef={nameRef}
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => {
+            setName(event.target.value)
+            if (errors.name) setErrors((current) => ({ ...current, name: '' }))
+          }}
           placeholder="Your name"
           autoComplete="name"
           maxLength={MAX_NAME_LENGTH}
           error={errors.name}
+          isShaking={isShaking}
+          onAnimationEnd={() => setIsShaking(false)}
         />
         <TextField
           id="contact-email"
@@ -258,11 +299,16 @@ const ContactForm = () => {
           type="email"
           fieldRef={emailRef}
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => {
+            setEmail(event.target.value)
+            if (errors.email) setErrors((current) => ({ ...current, email: '' }))
+          }}
           placeholder="you@example.com"
           autoComplete="email"
           maxLength={MAX_EMAIL_LENGTH}
           error={errors.email}
+          isShaking={isShaking}
+          onAnimationEnd={() => setIsShaking(false)}
         />
       </div>
 
@@ -276,24 +322,30 @@ const ContactForm = () => {
           rows={5}
           fieldRef={messageRef}
           value={message}
-          onChange={(event) => setMessage(event.target.value)}
+          onChange={(event) => {
+            setMessage(event.target.value)
+            if (errors.message) setErrors((current) => ({ ...current, message: '' }))
+          }}
           placeholder="What's on your mind?"
           maxLength={MAX_MESSAGE_LENGTH}
           error={errors.message}
+          isShaking={isShaking}
+          onAnimationEnd={() => setIsShaking(false)}
         />
       </div>
 
       <div style={cue(880)} className={enter()}>
         <button
           type="submit"
-          disabled={status === 'submitting'}
+          disabled={status !== 'idle'}
           className="cta-lift cta-lift--dark flex h-[49px] w-fit cursor-pointer items-center gap-[7px] rounded-[14px] bg-[#0f0f0f] pr-[22px] pl-[26px] text-[15px] font-semibold text-white hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === 'submitting' ? 'Sending…' : 'Send message'}
+          {status === 'checking' ? 'Checking…' : status === 'submitting' ? 'Sending…' : 'Send message'}
           <ArrowRight />
         </button>
         {submitError && (
-          <p role="alert" className="mt-[14px] text-[13px] font-medium text-black">
+          <p role="alert" className="error-in mt-[14px] flex items-center gap-[6px] text-[13px] font-medium text-[#e2483a]">
+            <ErrorIcon />
             {submitError}
           </p>
         )}
