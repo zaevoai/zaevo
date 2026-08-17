@@ -23,8 +23,8 @@ const Footer = ({ action = DEFAULT_ACTION, onHome }) => (
           </HomeLink>
           <p className="mt-[13px] font-mono text-[13px] leading-[20px] text-white/45">
             Early access opens{' '}
-            <time dateTime="2026-10-23" className="text-white/70">
-              October 23, 2026
+            <time dateTime="2026-10-11" className="text-white/70">
+              October 11, 2026
             </time>
           </p>
         </div>

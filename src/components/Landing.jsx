@@ -9,29 +9,6 @@ import Faq from './Faq.jsx'
 import Footer from './Footer.jsx'
 import ArrowRight from './ArrowRight.jsx'
 
-const BUILDERS = [
-  { name: 'Amara', skin: '#e7b48e', hair: '#2f2a26', shirt: '#cfd6e0' },
-  { name: 'Tomas', skin: '#f0c39c', hair: '#3a2f1c', shirt: '#f5b301' },
-  { name: 'Priya', skin: '#c9825a', hair: '#241713', shirt: '#e08a4a' },
-  { name: 'Ivan', skin: '#e8b189', hair: '#1b1512', shirt: '#2b3a55' },
-  { name: 'Naomi', skin: '#d99a6c', hair: '#191110', shirt: '#0f80d4' },
-]
-
-const Avatar = ({ person }) => (
-  <svg viewBox="0 0 40 40" className="h-[33px] w-[33px] shrink-0" role="img" aria-label={person.name}>
-    <circle cx="20" cy="20" r="20" fill="#ffffff" />
-    <clipPath id={`clip-${person.name}`}>
-      <circle cx="20" cy="20" r="17.5" />
-    </clipPath>
-    <g clipPath={`url(#clip-${person.name})`}>
-      <rect width="40" height="40" fill={person.shirt} />
-      <path d="M20 23c8 0 13 5.5 13 12v5H7v-5c0-6.5 5-12 13-12Z" fill={person.skin} />
-      <circle cx="20" cy="16" r="8" fill={person.skin} />
-      <path d="M12 15a8 8 0 0 1 16 0c0-4-3.5-6-8-6s-8 2-8 6Z" fill={person.hair} />
-    </g>
-  </svg>
-)
-
 const Landing = ({ onJoined, focusWaitlistOnMount = false }) => {
   /* arriving from a "join the waitlist" CTA elsewhere starts the token at 1, so
      the form calls itself out as it mounts; every later raise is a click here */
@@ -107,15 +84,8 @@ const Landing = ({ onJoined, focusWaitlistOnMount = false }) => {
             <WaitlistForm onJoined={onJoined} highlightToken={highlightToken} />
           </div>
 
-          <div style={cue(940)} className={`mt-[19px] flex items-center gap-[21px] ${enter()}`}>
-            <div className="flex">
-              {BUILDERS.map((person, index) => (
-                <div key={person.name} style={{ marginLeft: index === 0 ? 0 : -18.25 }}>
-                  <Avatar person={person} />
-                </div>
-              ))}
-            </div>
-            <p className="translate-y-[1px] font-mono text-[14.7px] leading-none text-black">
+          <div style={cue(940)} className={`mt-[19px] flex items-center justify-center ${enter()}`}>
+            <p className="text-[18px] leading-[23px] font-medium text-black">
               Be the first to try Zae
             </p>
           </div>
