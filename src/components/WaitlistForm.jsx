@@ -7,8 +7,6 @@ import { supabase } from '../lib/supabaseClient.js'
 import { validateEmail, MAX_EMAIL_LENGTH } from '../lib/validateEmail.js'
 import { domainAcceptsMail } from '../lib/checkDomain.js'
 
-/* Postgres unique_violation — thrown when this email already has a row */
-const UNIQUE_VIOLATION = '23505'
 /* raised by the ratelimit.enforce() trigger; PostgREST turns a PT-prefixed
    SQLSTATE into the matching HTTP status, so this arrives as a 429 */
 const RATE_LIMITED = 'PT429'
@@ -114,11 +112,15 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
 
       setStatus('submitting')
 
-      const { error: insertError } = await supabase
-        .from('waitlist_signups')
-        .insert({ email: normalisedEmail })
+      /* the RPC, not a plain insert — it's the only path that can tell a
+         brand-new address apart from a typo'd one that never confirmed and
+         is trying again, a distinction that needs a SELECT the anon role
+         isn't granted, so it has to happen behind this function instead */
+      const { data: outcome, error: joinError } = await supabase.rpc('join_waitlist', {
+        p_email: normalisedEmail,
+      })
 
-      if (insertError?.code === RATE_LIMITED) {
+      if (joinError?.code === RATE_LIMITED) {
         setStatus('idle')
         raiseError('Too many attempts — please wait a minute and try again.')
         return
@@ -127,15 +129,13 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
       /* surfaced on request even though it lets the form double as an
          enumeration check for whether an address is on the list — accepted
          tradeoff, not an oversight */
-      if (insertError?.code === UNIQUE_VIOLATION) {
+      if (joinError || outcome === 'already_confirmed') {
         setStatus('idle')
-        raiseError("You're already on the waitlist — we'll be in touch.")
-        return
-      }
-
-      if (insertError) {
-        setStatus('idle')
-        raiseError('Something went wrong — please try again in a moment.')
+        if (joinError) {
+          raiseError('Something went wrong — please try again in a moment.')
+        } else {
+          raiseError("You're already on the waitlist — we'll be in touch.")
+        }
         return
       }
 

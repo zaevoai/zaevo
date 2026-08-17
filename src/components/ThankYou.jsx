@@ -74,15 +74,15 @@ const ThankYou = ({ email, onHome }) => {
             style={{ '--rise-delay': '620ms' }}
             className="rise mt-[48px] text-[38px] leading-[1.1] font-semibold tracking-[-0.05em] text-black outline-none sm:text-[56px]"
           >
-            You're on the list.
+            Check your inbox.
           </h1>
 
           <p
             style={{ '--rise-delay': '720ms' }}
             className="rise mt-[16px] max-w-[430px] text-[15px] leading-[23px] font-medium text-black"
           >
-            Your invite goes to <span className="font-mono break-all">{email}</span> the moment early
-            access opens. Nothing else lands in your inbox.
+            We sent a confirmation link to <span className="font-mono break-all">{email}</span>. Click it
+            to lock in your spot — your invite follows the moment early access opens.
           </p>
 
           <div style={{ '--rise-delay': '820ms' }} className="rise">
