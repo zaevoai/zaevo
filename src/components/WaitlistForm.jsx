@@ -5,6 +5,7 @@ import TicketReveal from './TicketReveal.jsx'
 import prefersReducedMotion from '../lib/prefersReducedMotion.js'
 import { supabase } from '../lib/supabaseClient.js'
 import { validateEmail, MAX_EMAIL_LENGTH } from '../lib/validateEmail.js'
+import { domainAcceptsMail } from '../lib/checkDomain.js'
 
 /* Postgres unique_violation — thrown when this email already has a row */
 const UNIQUE_VIOLATION = '23505'
@@ -17,6 +18,7 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
   const [isHighlighted, setIsHighlighted] = useState(false)
+  const [isShaking, setIsShaking] = useState(false)
   /* set once submission succeeds; the ticket takes over from here, and only
      tearing it (not the form) hands off to the parent's onJoined */
   const [ticketEmail, setTicketEmail] = useState(null)
@@ -27,6 +29,13 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
      straight to PostgREST never renders this — which is why the real ceiling
      is the rate-limit trigger in the database. */
   const trapRef = useRef(null)
+
+  /* shares one entry point so every failure path gets the same cue: the
+     field kicks once to pull the eye down to the message that just appeared */
+  const raiseError = useCallback((message) => {
+    setError(message)
+    setIsShaking(true)
+  }, [])
 
   /* held in a ref so the effect below can reach the live instance without
      taking it as a dependency — a re-fire there would scroll the page for no
@@ -86,11 +95,23 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
 
       const validationError = validateEmail(email)
       if (validationError) {
-        setError(validationError)
+        raiseError(validationError)
         return
       }
       const normalisedEmail = email.trim().toLowerCase()
+      const domain = normalisedEmail.slice(normalisedEmail.lastIndexOf('@') + 1)
       setError('')
+      setStatus('checking')
+
+      /* the address is well-formed but the domain itself may not exist, or
+         may not accept mail at all — a person mashing the keyboard into the
+         field types exactly this, and no amount of regex catches it */
+      if (!(await domainAcceptsMail(domain))) {
+        setStatus('idle')
+        raiseError("That domain doesn't look like it can receive mail — check for a typo.")
+        return
+      }
+
       setStatus('submitting')
 
       const { error: insertError } = await supabase
@@ -99,24 +120,29 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
 
       if (insertError?.code === RATE_LIMITED) {
         setStatus('idle')
-        setError('Too many attempts — please wait a minute and try again.')
+        raiseError('Too many attempts — please wait a minute and try again.')
         return
       }
 
-      /* a duplicate email means they're already on the list — that's a
-         success from where they're standing, not something to surface as an
-         error, and treating it as one would let the form be used to check
-         whether an address has already signed up */
-      if (insertError && insertError.code !== UNIQUE_VIOLATION) {
+      /* surfaced on request even though it lets the form double as an
+         enumeration check for whether an address is on the list — accepted
+         tradeoff, not an oversight */
+      if (insertError?.code === UNIQUE_VIOLATION) {
         setStatus('idle')
-        setError("Something went wrong — please try again in a moment.")
+        raiseError("You're already on the waitlist — we'll be in touch.")
+        return
+      }
+
+      if (insertError) {
+        setStatus('idle')
+        raiseError('Something went wrong — please try again in a moment.')
         return
       }
 
       setStatus('idle')
       setTicketEmail(normalisedEmail)
     },
-    [email],
+    [email, raiseError],
   )
 
   return (
@@ -140,11 +166,13 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
       <div
         ref={fieldRef}
         onAnimationEnd={(event) => {
-          if (event.target === event.currentTarget) setIsHighlighted(false)
+          if (event.target !== event.currentTarget) return
+          setIsHighlighted(false)
+          setIsShaking(false)
         }}
-        className={`flex h-[61px] items-center rounded-[20px] border border-white pl-[14px] pr-[5px] sm:pl-[19px] ${
-          isHighlighted ? 'field-flash' : ''
-        }`}
+        className={`flex h-[61px] items-center rounded-[20px] border pl-[14px] pr-[5px] transition-colors duration-200 sm:pl-[19px] ${
+          error ? 'border-[#e2483a]' : 'border-white'
+        } ${isHighlighted ? 'field-flash' : ''} ${isShaking ? 'field-shake' : ''}`}
       >
         <label htmlFor="waitlist-email" className="sr-only">
           Email address
@@ -155,7 +183,10 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
           type="email"
           name="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => {
+            setEmail(event.target.value)
+            if (error) setError('')
+          }}
           placeholder="you@example.com"
           autoComplete="email"
           maxLength={MAX_EMAIL_LENGTH}
@@ -165,14 +196,23 @@ const WaitlistForm = ({ onJoined, highlightToken = 0 }) => {
         />
         <ShinyButton
           type="submit"
-          disabled={status === 'submitting'}
+          disabled={status !== 'idle'}
           className="shiny-cta--waitlist shrink-0"
         >
-          {status === 'submitting' ? 'Joining…' : 'Join waitlist'}
+          {status === 'checking' ? 'Checking…' : status === 'submitting' ? 'Joining…' : 'Join waitlist'}
         </ShinyButton>
       </div>
       {error && (
-        <p id="waitlist-error" role="alert" className="mt-2 text-[13px] font-medium text-black">
+        <p
+          id="waitlist-error"
+          role="alert"
+          className="error-in mt-[9px] flex items-center gap-[6px] text-[13px] font-medium text-[#e2483a]"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+            <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="2" />
+            <path d="M12 7.5v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="12" cy="16.5" r="1.15" fill="currentColor" />
+          </svg>
           {error}
         </p>
       )}

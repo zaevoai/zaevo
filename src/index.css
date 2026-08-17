@@ -36,6 +36,20 @@
     outline: 2px solid var(--color-ink);
     outline-offset: 2px;
   }
+
+  /* Chrome fills a remembered address in with its own opaque blue-tinted
+     background, which reads as a hard box against these transparent pill
+     fields. A huge inset shadow in the field's own text color paints over
+     it; the absurd transition delay is the standard trick to stop Chrome
+     from re-asserting its background before that shadow has a chance to. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #0d0d10;
+    -webkit-box-shadow: 0 0 0 1000px transparent inset;
+    box-shadow: 0 0 0 1000px transparent inset;
+    transition: background-color 600000s ease-in-out 0s;
+  }
 }
 
 @layer utilities {
@@ -183,6 +197,16 @@
     animation: field-flash 1400ms ease-out;
   }
 
+  /* a single sharp kick when a submission is rejected — reads as "no", not
+     as decoration, so it stays quick and small */
+  .field-shake {
+    animation: field-shake 360ms ease-in-out;
+  }
+
+  .error-in {
+    animation: error-in 220ms ease-out;
+  }
+
   /* splash-screen loading bar under the logo; duration must match FILL_MS in
      Preloader.jsx so the fade-out waits for the fill to actually finish */
   .preloader-bar {
@@ -197,6 +221,32 @@
   }
   to {
     width: 100%;
+  }
+}
+
+@keyframes field-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes error-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
